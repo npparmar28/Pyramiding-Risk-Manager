@@ -15,51 +15,70 @@
     :root { --bg:#0b0f14; --card:#121824; --muted:#9fb0c3; --text:#e7eef7; --accent:#4dd8a3; --danger:#ff5d6c; --line:#1e2a3a; --tab-active:#1e2a3a; }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial; background:var(--bg); color:var(--text)}
-    .wrap{max-width:760px;margin:0 auto;padding:16px 14px 36px}
-    .header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-    h1{font-size:20px;margin:8px 0}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:12px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-    @media (min-width:520px){ .grid{grid-template-columns:repeat(3,1fr)} }
-    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
-    input[type="number"], input[type="text"]{width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--line);background:#0f1520;color:var(--text);font-size:16px}
-    input::placeholder{color:#6b7c90}
-    .row{display:flex;align-items:center;gap:10px}
-    .btn{appearance:none;border:0;border-radius:12px;padding:11px 14px;font-weight:600;background:#1b2533;color:var(--text);cursor:pointer}
+    .wrap{max-width:100%;margin:0 auto;padding:12px 10px 30px}
+    .header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;padding:0 5px}
+    h1{font-size:18px;margin:6px 0}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+    .grid{display:grid;grid-template-columns:1fr;gap:10px}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+    @media (min-width:380px){ .grid{grid-template-columns:1fr 1fr} }
+    @media (min-width:520px){ .grid{grid-template-columns:1fr 1fr 1fr} }
+    label{font-size:11px;color:var(--muted);display:block;margin-bottom:5px}
+    input[type="number"], input[type="text"]{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0f1520;color:var(--text);font-size:14px}
+    input::placeholder{color:#6b7c90;font-size:13px}
+    .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .btn{appearance:none;border:0;border-radius:10px;padding:10px 12px;font-weight:600;background:#1b2533;color:var(--text);cursor:pointer;font-size:13px;flex:1}
     .btn:hover{filter:brightness(1.1)}
     .btn-accent{background:var(--accent);color:#012916}
     .btn-danger{background:var(--danger);color:#19030a}
     .btn-short{background:var(--danger);color:#19030a}
-    .muted{color:var(--muted)}
-    .pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#0b1320;border:1px solid var(--line);font-size:12px}
-    table{width:100%;border-collapse:collapse;margin-top:8px}
-    th,td{padding:10px;border-bottom:1px dashed var(--line);text-align:right;font-variant-numeric:tabular-nums}
+    .btn-small{padding:8px 10px;font-size:12px}
+    .muted{color:var(--muted);font-size:12px}
+    .pill{display:inline-block;padding:3px 6px;border-radius:8px;background:#0b1320;border:1px solid var(--line);font-size:11px}
+    table{width:100%;border-collapse:collapse;margin-top:6px;font-size:12px}
+    th,td{padding:8px 6px;border-bottom:1px dashed var(--line);text-align:right;font-variant-numeric:tabular-nums}
     th:first-child, td:first-child{text-align:left}
-    tfoot td{border-top:1px solid var(--line);font-weight:700}
+    tfoot td{border-top:1px solid var(--line);font-weight:700;padding-top:10px}
     .right{float:right}
-    .note{font-size:12px;color:var(--muted)}
+    .note{font-size:11px;color:var(--muted);line-height:1.4}
     .ok{color:var(--accent)}
     .bad{color:var(--danger)}
-    .sticky{position:sticky;bottom:0;backdrop-filter:blur(8px);background:linear-gradient(180deg, rgba(11,15,20,0), var(--bg));padding-top:12px;margin-top:8px}
+    .sticky{position:sticky;bottom:0;backdrop-filter:blur(8px);background:linear-gradient(180deg, rgba(11,15,20,0), var(--bg));padding-top:10px;margin-top:6px}
     .direction-long { color: var(--accent); }
     .direction-short { color: var(--danger); }
     
     /* Tabs styling */
-    .tabs-container{position:relative;margin-bottom:12px}
-    .tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-ms-overflow-style:none}
+    .tabs-container{position:relative;margin-bottom:10px}
+    .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;scrollbar-width:none;-ms-overflow-style:none}
     .tabs::-webkit-scrollbar{display:none}
-    .tab{padding:8px 16px;border-radius:12px;background:var(--card);border:1px solid var(--line);cursor:pointer;white-space:nowrap;font-size:14px;flex-shrink:0}
+    .tab{padding:6px 12px;border-radius:10px;background:var(--card);border:1px solid var(--line);cursor:pointer;white-space:nowrap;font-size:12px;flex-shrink:0}
     .tab.active{background:var(--tab-active);border-color:var(--accent)}
-    .tab-add{padding:8px 12px;background:var(--accent);color:#012916;font-weight:bold;flex-shrink:0}
+    .tab-add{padding:6px 10px;background:var(--accent);color:#012916;font-weight:bold;flex-shrink:0;font-size:14px}
     
     /* Script name input */
-    .script-name-container{margin-bottom:12px}
-    .script-name-input{width:100%;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:#0f1520;color:var(--text);font-size:16px}
+    .script-name-container{margin-bottom:10px}
+    .script-name-input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#0f1520;color:var(--text);font-size:14px}
     
     /* Loading indicator */
     .loading{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000}
+    
+    /* Quantity input section */
+    .quantity-section{margin-bottom:12px;padding:10px;background:var(--card);border-radius:10px;border:1px solid var(--line)}
+    .quantity-input{font-size:16px;font-weight:600;text-align:center}
+    
+    /* Entry cards */
+    .entry-card{background:#0f1520;border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px}
+    .entry-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .entry-title{font-size:12px;font-weight:600;color:var(--muted)}
+    .entry-values{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .entry-value{font-size:11px}
+    .entry-value strong{color:var(--text);font-weight:600}
+    
+    /* Profit indicators */
+    .profit-badge{padding:2px 6px;border-radius:8px;font-size:10px;font-weight:600}
+    .profit-positive{background:var(--accent);color:#012916}
+    .profit-negative{background:var(--danger);color:#19030a}
   </style>
 </head>
 <body>
@@ -67,8 +86,8 @@
   
   <div class="wrap" id="mainContent" style="display:none">
     <div class="header">
-      <h1>📈 Pyramiding Risk Manager</h1>
-      <span class="pill">Mobile • Offline • PWA</span>
+      <h1>📈 Risk Manager</h1>
+      <span class="pill">Mobile • PWA</span>
     </div>
 
     <div class="tabs-container">
@@ -77,84 +96,91 @@
 
     <div class="card">
       <div class="script-name-container">
-        <input type="text" id="scriptName" class="script-name-input" placeholder="Enter script name (e.g., RELIANCE, INFY)" />
+        <input type="text" id="scriptName" class="script-name-input" placeholder="Script name (RELIANCE, INFY)" />
       </div>
       
-      <div class="row" style="justify-content: center; margin-bottom: 12px;">
-        <button id="tradeDirection" class="btn" style="width: 120px;">
+      <div class="row" style="justify-content: center; margin-bottom: 10px;">
+        <button id="tradeDirection" class="btn" style="min-width:100px">
           Long ▲
         </button>
       </div>
+      
       <div class="grid">
         <div>
-          <label>Currency Symbol</label>
+          <label>Currency</label>
           <input id="currency" type="text" value="₹" maxlength="3" />
         </div>
         <div>
-          <label>Max Risk (absolute)</label>
+          <label>Max Risk (₹)</label>
           <input id="risk" type="number" inputmode="decimal" value="1000" min="1" />
         </div>
         <div>
-          <label>Max Entries</label>
-          <input id="maxEntries" type="number" inputmode="numeric" value="10" min="1" max="20" />
+          <label>Current Price</label>
+          <input id="currentPrice" type="number" inputmode="decimal" placeholder="Live price" />
         </div>
       </div>
-      <div class="grid" style="margin-top:10px">
-        <div>
-          <label>Current Price (optional)</label>
-          <input id="currentPrice" type="number" inputmode="decimal" placeholder="Live/Last price" />
-        </div>
-        <div class="row" style="align-items:flex-end;gap:8px;grid-column:span 2">
-          <button class="btn btn-accent" id="addEntry">+ Add Entry</button>
-          <button class="btn" id="addSample">Add Sample</button>
-          <button class="btn btn-danger right" id="reset">Reset</button>
+      
+      <div class="quantity-section">
+        <label>Total Quantity to Distribute</label>
+        <input id="totalQuantity" type="number" inputmode="numeric" placeholder="Enter total shares" class="quantity-input" />
+        <div class="note" style="margin-top:6px">
+          Auto-distributed: 4X + 2X + 2X + 1X + 1X (10X total)
         </div>
       </div>
-      <div class="note" style="margin-top:8px">
-        Enter quantity and price for each entry. Use decreasing quantities for better averaging (e.g., 200, 100, 100, 50, 50).
+
+      <div class="row" style="justify-content:space-between;gap:6px;margin-top:10px">
+        <button class="btn btn-accent btn-small" id="distributeBtn">Auto Distribute</button>
+        <button class="btn btn-small" id="addSample">Sample Data</button>
+        <button class="btn btn-danger btn-small" id="reset">Reset All</button>
       </div>
     </div>
 
-    <div class="card" id="entriesCard">
+    <div class="card">
+      <div class="entry-header">
+        <div class="entry-title">ENTRIES</div>
+        <div class="muted">Click to edit prices</div>
+      </div>
       <div id="entriesContainer"></div>
     </div>
 
-    <div class="card" id="resultsCard">
-      <div class="row" style="justify-content:space-between">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px">
         <div>
-          <div class="muted">Running Summary</div>
-          <div id="summaryLine" style="font-weight:700;margin-top:6px"></div>
+          <div class="muted">Summary</div>
+          <div id="summaryLine" style="font-weight:700;margin-top:4px;font-size:13px"></div>
         </div>
         <div style="text-align:right">
-          <div class="muted">Combined Stoploss</div>
-          <div id="combinedSL" style="font-size:24px;font-weight:800"></div>
+          <div class="muted">Stoploss</div>
+          <div id="combinedSL" style="font-size:20px;font-weight:800"></div>
         </div>
       </div>
 
-      <table id="table">
-        <thead>
-          <tr>
-            <th>Entry</th>
-            <th>Qty</th>
-            <th>Price</th>
-            <th>Value</th>
-            <th>Cum Qty</th>
-            <th>Avg Cost</th>
-            <th>Stoploss</th>
-            <th>P&L @Now</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-        <tfoot>
-          <tr>
-            <td colspan="8" id="foot"></td>
-          </tr>
-        </tfoot>
-      </table>
+      <div style="overflow-x:auto">
+        <table id="table">
+          <thead>
+            <tr>
+              <th>Entry</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Value</th>
+              <th>Avg</th>
+              <th>SL</th>
+              <th>P&L @Level</th>
+              <th>P&L @Now</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="8" id="foot"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
 
       <div class="sticky">
         <div class="note">
-          Formula: SL<sub>i</sub> = AvgCost<sub>i</sub> <span id="directionSign">±</span> (MaxRisk / CumQty<sub>i</sub>). Never move SL against position.
+          SL = Avg ± (Risk / Total Qty). P&L @Level shows cumulative profit at that entry price.
         </div>
       </div>
     </div>
@@ -168,26 +194,21 @@
     isLong: true,
     currency: '₹',
     risk: 1000,
-    maxEntries: 10,
     currentPrice: '',
-    scriptName: 'NIFTY'
+    scriptName: 'NIFTY',
+    totalQuantity: 0
   };
 
-  const SAMPLE_ENTRIES = [
-    { quantity: 200, price: 100 },
-    { quantity: 100, price: 104 },
-    { quantity: 100, price: 108 },
-    { quantity: 50, price: 112 },
-    { quantity: 50, price: 116 }
-  ];
+  const DISTRIBUTION_RATIOS = [4, 2, 2, 1, 1]; // 4X + 2X + 2X + 1X + 1X = 10X
+  const TOTAL_RATIO = DISTRIBUTION_RATIOS.reduce((sum, ratio) => sum + ratio, 0);
 
   const els = {
     currency: document.getElementById('currency'),
     risk: document.getElementById('risk'),
-    maxEntries: document.getElementById('maxEntries'),
     currentPrice: document.getElementById('currentPrice'),
     scriptName: document.getElementById('scriptName'),
-    addEntry: document.getElementById('addEntry'),
+    totalQuantity: document.getElementById('totalQuantity'),
+    distributeBtn: document.getElementById('distributeBtn'),
     addSample: document.getElementById('addSample'),
     reset: document.getElementById('reset'),
     tradeDirection: document.getElementById('tradeDirection'),
@@ -205,7 +226,7 @@
   let tabs = {};
   let currentTab = 'tab1';
 
-  // Safe localStorage functions with error handling
+  // Safe localStorage functions
   function safeSetItem(key, value) {
     try {
       localStorage.setItem(key, JSON.stringify(value));
@@ -226,34 +247,19 @@
     }
   }
 
-  // Initialize tabs with retry logic
+  // Initialize tabs
   function initTabs() {
-    let attempts = 0;
-    const maxAttempts = 3;
-    
-    function tryInit() {
-      const savedTabs = safeGetItem(STORAGE_KEY + '_tabs');
-      
-      if (savedTabs && Object.keys(savedTabs).length > 0) {
-        tabs = savedTabs;
-        renderTabs();
-        
-        // Try to restore last active tab, fallback to first tab
-        const lastActiveTab = safeGetItem(STORAGE_KEY + '_activeTab');
-        const firstTab = Object.keys(tabs)[0];
-        switchTab(lastActiveTab && tabs[lastActiveTab] ? lastActiveTab : firstTab);
-        
-        showContent();
-      } else if (attempts < maxAttempts) {
-        attempts++;
-        setTimeout(tryInit, 100 * attempts);
-      } else {
-        createDefaultTab();
-        showContent();
-      }
+    const savedTabs = safeGetItem(STORAGE_KEY + '_tabs');
+    if (savedTabs && Object.keys(savedTabs).length > 0) {
+      tabs = savedTabs;
+      renderTabs();
+      const lastActiveTab = safeGetItem(STORAGE_KEY + '_activeTab');
+      const firstTab = Object.keys(tabs)[0];
+      switchTab(lastActiveTab && tabs[lastActiveTab] ? lastActiveTab : firstTab);
+    } else {
+      createDefaultTab();
     }
-    
-    tryInit();
+    showContent();
   }
 
   function showContent() {
@@ -262,12 +268,7 @@
   }
 
   function createDefaultTab() {
-    tabs = {
-      tab1: {
-        ...DEFAULT_STATE,
-        scriptName: 'NIFTY'
-      }
-    };
+    tabs = { tab1: {...DEFAULT_STATE, scriptName: 'NIFTY'} };
     safeSetItem(STORAGE_KEY + '_tabs', tabs);
     safeSetItem(STORAGE_KEY + '_activeTab', 'tab1');
     renderTabs();
@@ -276,7 +277,6 @@
 
   function renderTabs() {
     els.tabsContainer.innerHTML = '';
-    
     Object.keys(tabs).forEach(tabId => {
       const tab = document.createElement('div');
       tab.className = `tab ${tabId === currentTab ? 'active' : ''}`;
@@ -302,59 +302,32 @@
   }
 
   function switchTab(tabId) {
-    if (!tabs[tabId]) {
-      // If tab doesn't exist, use first available tab
-      tabId = Object.keys(tabs)[0] || 'tab1';
-    }
-    
-    // Save current tab state
+    if (!tabs[tabId]) tabId = Object.keys(tabs)[0] || 'tab1';
     saveCurrentTabState();
-    
-    // Switch to new tab
     currentTab = tabId;
     state = {...tabs[tabId]};
     
-    // Update UI
-    els.currency.value = state.currency || DEFAULT_STATE.currency;
-    els.risk.value = state.risk || DEFAULT_STATE.risk;
-    els.maxEntries.value = state.maxEntries || DEFAULT_STATE.maxEntries;
+    els.currency.value = state.currency || '₹';
+    els.risk.value = state.risk || 1000;
     els.currentPrice.value = state.currentPrice || '';
-    els.scriptName.value = state.scriptName || DEFAULT_STATE.scriptName;
+    els.scriptName.value = state.scriptName || 'NIFTY';
+    els.totalQuantity.value = state.totalQuantity || '';
     
-    // Rebuild entry inputs
-    els.entriesContainer.innerHTML = '';
-    (state.entries || []).forEach(entry => {
-      addEntryRow(entry.quantity, entry.price);
-    });
-    
+    renderEntries();
     updateDirectionButton();
     compute();
     renderTabs();
-    
-    // Save active tab
     safeSetItem(STORAGE_KEY + '_activeTab', currentTab);
   }
 
   function saveCurrentTabState() {
     if (!currentTab || !tabs[currentTab]) return;
     
-    // Collect all entries from inputs
-    state.entries = [];
-    const entryRows = els.entriesContainer.querySelectorAll('.entry-row');
-    entryRows.forEach(row => {
-      const qtyInput = row.querySelector('.entry-qty');
-      const priceInput = row.querySelector('.entry-price');
-      state.entries.push({
-        quantity: qtyInput.value ? Number(qtyInput.value) : 0,
-        price: priceInput.value ? Number(priceInput.value) : 0
-      });
-    });
-    
     state.currency = els.currency.value;
-    state.risk = Number(els.risk.value) || DEFAULT_STATE.risk;
-    state.maxEntries = Number(els.maxEntries.value) || DEFAULT_STATE.maxEntries;
+    state.risk = Number(els.risk.value) || 1000;
     state.currentPrice = els.currentPrice.value;
     state.scriptName = els.scriptName.value;
+    state.totalQuantity = Number(els.totalQuantity.value) || 0;
     
     tabs[currentTab] = {...state};
     saveTabs();
@@ -364,20 +337,86 @@
     safeSetItem(STORAGE_KEY + '_tabs', tabs);
   }
 
-  function fmt(n){
-    if (isNaN(n) || !isFinite(n)) return '—';
-    return Number(n).toLocaleString(undefined,{maximumFractionDigits:0});
+  function distributeQuantities() {
+    const totalQty = Number(els.totalQuantity.value);
+    if (!totalQty || totalQty <= 0) {
+      alert('Please enter a valid total quantity');
+      return;
+    }
+
+    const unitSize = totalQty / TOTAL_RATIO;
+    state.entries = DISTRIBUTION_RATIOS.map(ratio => ({
+      quantity: Math.round(ratio * unitSize),
+      price: 0
+    }));
+
+    renderEntries();
+    compute();
+    saveCurrentTabState();
   }
 
-  function fmtDecimal(n){
-    if (isNaN(n) || !isFinite(n)) return '—';
-    return Number(n).toLocaleString(undefined,{maximumFractionDigits:2});
+  function renderEntries() {
+    els.entriesContainer.innerHTML = '';
+    state.entries.forEach((entry, index) => {
+      const entryDiv = document.createElement('div');
+      entryDiv.className = 'entry-card';
+      const entryValue = entry.price && entry.quantity ? entry.quantity * entry.price : 0;
+      
+      entryDiv.innerHTML = `
+        <div class="entry-header">
+          <div class="entry-title">ENTRY #${index + 1}</div>
+          <div class="muted">${fmt(entry.quantity)} shares</div>
+        </div>
+        <div class="entry-values">
+          <div class="entry-value">
+            <span class="muted">Price: </span>
+            <input type="number" class="entry-price" placeholder="Enter price" 
+                   value="${entry.price || ''}" data-index="${index}" 
+                   inputmode="decimal" step="0.01" min="0.01"
+                   style="width:80px;padding:4px 6px;font-size:12px;border-radius:6px;border:1px solid var(--line);background:#0a101a">
+          </div>
+          <div class="entry-value">
+            <span class="muted">Value: </span>
+            <strong>${entryValue ? cur(entryValue) : '—'}</strong>
+          </div>
+        </div>
+      `;
+      els.entriesContainer.appendChild(entryDiv);
+    });
+
+    // Add event listeners to price inputs
+    setTimeout(() => {
+      document.querySelectorAll('.entry-price').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const index = parseInt(e.target.dataset.index);
+          const price = parseFloat(e.target.value) || 0;
+          if (state.entries[index]) {
+            state.entries[index].price = price;
+            
+            // Update the value display
+            const entryValue = state.entries[index].quantity * price;
+            const valueElement = e.target.closest('.entry-card').querySelector('.entry-value strong');
+            if (valueElement) {
+              valueElement.textContent = cur(entryValue);
+            }
+            
+            compute();
+            saveCurrentTabState();
+          }
+        });
+      });
+    }, 100);
   }
 
-  function cur(n){
+  function fmt(n) {
+    if (isNaN(n) || !isFinite(n)) return '—';
+    return Number(n).toLocaleString(undefined, {maximumFractionDigits: 0});
+  }
+
+  function cur(n) {
     const c = els.currency.value || '₹';
     if (isNaN(n) || !isFinite(n)) return '—';
-    return c + ' ' + Number(n).toLocaleString(undefined,{maximumFractionDigits:2});
+    return c + ' ' + Number(n).toLocaleString(undefined, {maximumFractionDigits: 2});
   }
 
   function toggleTradeDirection() {
@@ -391,89 +430,11 @@
     els.tradeDirection.textContent = state.isLong ? 'Long ▲' : 'Short ▼';
     els.tradeDirection.classList.toggle('btn-accent', state.isLong);
     els.tradeDirection.classList.toggle('btn-short', !state.isLong);
-    document.getElementById('directionSign').textContent = state.isLong ? '−' : '+';
-  }
-
-  function addEntryRow(quantity = '', price = '') {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'entry-row grid-3';
-    wrapper.style.marginTop = '8px';
-
-    const label = document.createElement('div');
-    const entryIndex = els.entriesContainer.children.length + 1;
-    label.innerHTML = `<label>Entry #${entryIndex}</label>`;
-
-    const qtyInput = document.createElement('input');
-    qtyInput.type = 'number';
-    qtyInput.inputMode = 'numeric';
-    qtyInput.placeholder = 'Qty (e.g., 200)';
-    qtyInput.value = quantity;
-    qtyInput.className = 'entry-qty';
-    qtyInput.min = '1';
-    qtyInput.addEventListener('input', () => {
-      onChange();
-      saveCurrentTabState();
-    });
-
-    const priceInput = document.createElement('input');
-    priceInput.type = 'number';
-    priceInput.inputMode = 'decimal';
-    priceInput.placeholder = 'Price (e.g., 100.50)';
-    priceInput.value = price;
-    priceInput.className = 'entry-price';
-    priceInput.min = '0.01';
-    priceInput.step = '0.01';
-    priceInput.addEventListener('input', () => {
-      onChange();
-      saveCurrentTabState();
-    });
-
-    const removeBtn = document.createElement('button');
-    removeBtn.className = 'btn btn-danger';
-    removeBtn.textContent = 'Remove';
-    removeBtn.addEventListener('click', () => {
-      els.entriesContainer.removeChild(wrapper);
-      rebuildInputs();
-      compute();
-      saveCurrentTabState();
-    });
-
-    wrapper.appendChild(label);
-    wrapper.appendChild(qtyInput);
-    wrapper.appendChild(priceInput);
-    wrapper.appendChild(removeBtn);
-    els.entriesContainer.appendChild(wrapper);
-  }
-
-  function rebuildInputs() {
-    const entryRows = els.entriesContainer.querySelectorAll('.entry-row');
-    entryRows.forEach((row, index) => {
-      const label = row.querySelector('label');
-      if (label) label.textContent = `Entry #${index + 1}`;
-    });
-  }
-
-  function onChange() {
-    compute();
   }
 
   function compute() {
     const risk = Math.max(0, Number(els.risk.value) || 0);
     const cpx = els.currentPrice.value === '' ? NaN : Number(els.currentPrice.value);
-
-    // Collect all valid entries
-    const entries = [];
-    const entryRows = els.entriesContainer.querySelectorAll('.entry-row');
-    entryRows.forEach(row => {
-      const qtyInput = row.querySelector('.entry-qty');
-      const priceInput = row.querySelector('.entry-price');
-      const quantity = qtyInput.value ? Number(qtyInput.value) : NaN;
-      const price = priceInput.value ? Number(priceInput.value) : NaN;
-      
-      if (!isNaN(quantity) && !isNaN(price) && quantity > 0 && price > 0) {
-        entries.push({ quantity, price });
-      }
-    });
 
     let rows = '';
     let cumQty = 0;
@@ -481,92 +442,111 @@
     let combinedSL = NaN;
     let lastValidIdx = -1;
 
-    entries.forEach((entry, idx) => {
+    state.entries.forEach((entry, idx) => {
       const { quantity, price } = entry;
+      if (!quantity || !price || price <= 0) {
+        rows += `<tr><td>#${idx + 1}</td><td colspan="7" class="muted">Enter price</td></tr>`;
+        return;
+      }
+
+      const entryValue = quantity * price;
       cumQty += quantity;
-      totalCost += quantity * price;
+      totalCost += entryValue;
       const avgCost = totalCost / cumQty;
       
-      // Calculate stoploss
       const sl = state.isLong 
-        ? avgCost - (risk / cumQty)   // Long: SL below average
-        : avgCost + (risk / cumQty);  // Short: SL above average
+        ? avgCost - (risk / cumQty)
+        : avgCost + (risk / cumQty);
       
       combinedSL = sl;
       lastValidIdx = idx;
 
-      // Calculate P&L at current price
+      // Calculate cumulative P&L at this entry's price (P&L @Level)
+      const pnlAtLevel = state.isLong
+        ? (price - avgCost) * cumQty
+        : (avgCost - price) * cumQty;
+
+      // Calculate P&L at current market price (P&L @Now)
       const pnlAtNow = isFinite(cpx) 
         ? state.isLong 
-          ? (cpx - avgCost) * cumQty  // Long: profit if current > avg
-          : (avgCost - cpx) * cumQty  // Short: profit if current < avg
+          ? (cpx - avgCost) * cumQty
+          : (avgCost - cpx) * cumQty
         : NaN;
 
       const slClass = state.isLong ? 'direction-long' : 'direction-short';
-      const entryValue = quantity * price;
+      const pnlNowClass = pnlAtNow >= 0 ? 'ok' : 'bad';
+      const pnlLevelClass = pnlAtLevel >= 0 ? 'ok' : 'bad';
       
       rows += `<tr>
         <td>#${idx + 1}</td>
         <td>${fmt(quantity)}</td>
         <td>${cur(price)}</td>
         <td>${cur(entryValue)}</td>
-        <td>${fmt(cumQty)}</td>
         <td>${cur(avgCost)}</td>
         <td class="${slClass}">${cur(sl)}</td>
-        <td>${isFinite(cpx) ? `<span class="${pnlAtNow >= 0 ? 'ok' : 'bad'}">${cur(pnlAtNow)}</span>` : '—'}</td>
+        <td class="${pnlLevelClass}">${cur(pnlAtLevel)}</td>
+        <td class="${pnlNowClass}">${isFinite(cpx) ? cur(pnlAtNow) : '—'}</td>
       </tr>`;
     });
 
-    els.tbody.innerHTML = rows || `<tr><td colspan="8" class="muted" style="text-align:center;padding:16px">Add entries to see calculations…</td></tr>`;
+    els.tbody.innerHTML = rows || `<tr><td colspan="8" class="muted" style="text-align:center;padding:12px">Enter prices to see calculations</td></tr>`;
 
     if (lastValidIdx >= 0) {
       const avgFinal = totalCost / cumQty;
-      const directionText = state.isLong ? 'long' : 'short';
       const totalValue = totalCost;
+      const directionText = state.isLong ? 'long' : 'short';
       
-      const txt = `${fmt(lastValidIdx + 1)} ${directionText} entries, ${fmt(cumQty)} shares, Avg ${cur(avgFinal)} • Total: ${cur(totalValue)} • Risk: ${cur(risk)}`;
+      const txt = `${lastValidIdx + 1} entries, ${fmt(cumQty)} shares, Avg ${cur(avgFinal)}`;
       els.summaryLine.textContent = txt;
       
       els.combinedSL.className = state.isLong ? 'direction-long' : 'direction-short';
       els.combinedSL.textContent = cur(combinedSL);
       
-      const directionAdvice = state.isLong
-        ? `Place one combined stoploss at <strong class="direction-long">${cur(combinedSL)}</strong> (below average).`
-        : `Place one combined stoploss at <strong class="direction-short">${cur(combinedSL)}</strong> (above average).`;
+      const totalPnl = isFinite(cpx) ? (state.isLong ? (cpx - avgFinal) * cumQty : (avgFinal - cpx) * cumQty) : 0;
+      const pnlText = isFinite(cpx) ? ` • P&L: ${cur(totalPnl)}` : '';
       
-      els.foot.innerHTML = directionAdvice;
+      els.foot.innerHTML = `Total: ${cur(totalValue)} • Risk: ${cur(risk)}${pnlText}`;
     } else {
-      els.summaryLine.textContent = 'No positions yet';
+      els.summaryLine.textContent = 'Enter prices to start';
       els.combinedSL.textContent = '—';
       els.foot.textContent = '';
     }
   }
 
   // Event Listeners
-  els.addEntry.addEventListener('click', () => {
-    const maxEntries = Math.max(1, Math.min(20, Number(els.maxEntries.value) || 10));
-    if (state.entries && state.entries.length >= maxEntries) return alert('Reached Max Entries');
-    addEntryRow('', '');
-    compute();
-    saveCurrentTabState();
-  });
-
+  els.distributeBtn.addEventListener('click', distributeQuantities);
+  
   els.addSample.addEventListener('click', () => {
-    if (confirm('Replace current entries with sample decreasing pyramid?')) {
-      els.entriesContainer.innerHTML = '';
-      SAMPLE_ENTRIES.forEach(entry => {
-        addEntryRow(entry.quantity, entry.price);
+    els.totalQuantity.value = 500;
+    distributeQuantities();
+    // Set sample prices after a delay to ensure inputs are rendered
+    setTimeout(() => {
+      const samplePrices = [100, 104, 108, 112, 116];
+      samplePrices.forEach((price, index) => {
+        if (state.entries[index]) {
+          state.entries[index].price = price;
+          const input = document.querySelector(`.entry-price[data-index="${index}"]`);
+          if (input) input.value = price;
+          
+          // Update the value display
+          const entryValue = state.entries[index].quantity * price;
+          const valueElement = input.closest('.entry-card').querySelector('.entry-value strong');
+          if (valueElement) {
+            valueElement.textContent = cur(entryValue);
+          }
+        }
       });
       compute();
       saveCurrentTabState();
-    }
+    }, 200);
   });
 
   els.reset.addEventListener('click', () => {
-    if (confirm('Reset all entries and settings for this script?')) {
+    if (confirm('Reset all data?')) {
       state.entries = [];
-      els.entriesContainer.innerHTML = '';
+      els.totalQuantity.value = '';
       els.currentPrice.value = '';
+      renderEntries();
       compute();
       saveCurrentTabState();
     }
@@ -574,40 +554,27 @@
 
   els.tradeDirection.addEventListener('click', toggleTradeDirection);
 
-  ['risk', 'currency', 'maxEntries', 'currentPrice', 'scriptName'].forEach(id => {
+  ['risk', 'currency', 'currentPrice', 'scriptName', 'totalQuantity'].forEach(id => {
     els[id].addEventListener('input', () => {
       compute();
       saveCurrentTabState();
-      if (id === 'scriptName') {
-        renderTabs();
-      }
+      if (id === 'scriptName') renderTabs();
     });
   });
 
-  // Initialize with error handling
-  setTimeout(() => {
-    try {
-      initTabs();
-    } catch (error) {
-      console.error('Initialization error:', error);
-      createDefaultTab();
-      showContent();
-    }
-  }, 100);
+  // Initialize
+  setTimeout(initTabs, 100);
 })();
 
-// PWA Service Worker with GitHub Pages fix
+// PWA Service Worker
 if ("serviceWorker" in navigator) {
   window.addEventListener('load', () => {
-    // Fix for GitHub Pages subdirectory
     if (window.location.pathname === '/' && !window.location.search.includes('pwa')) {
       window.location.href = '/Pyramiding-Risk-Manager/';
     } else {
       navigator.serviceWorker.register('/Pyramiding-Risk-Manager/sw.js', {
         scope: '/Pyramiding-Risk-Manager/'
-      })
-      .then(() => console.log("Service Worker registered"))
-      .catch(err => console.log("SW registration failed", err));
+      }).catch(console.error);
     }
   });
 }

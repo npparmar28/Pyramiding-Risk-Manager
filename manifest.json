@@ -1,0 +1,22 @@
+{
+  "name": "Pyramiding-Risk-Manager",
+  "short_name": "RiskManager",
+  "description": "Calculate pyramiding positions with capped risk for both long and short trades",
+  "start_url": "/Pyramiding-Risk-Manager/",
+  "scope": "/Pyramiding-Risk-Manager/",
+  "display": "standalone",
+  "background_color": "#0b0f14",
+  "theme_color": "#121824",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

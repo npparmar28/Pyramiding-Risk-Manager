@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Pyramiding Risk Manager</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#121824">
+  <meta name="description" content="Calculate pyramiding positions with capped risk for both long and short trades">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <style>
+    :root { --bg:#0b0f14; --card:#121824; --muted:#9fb0c3; --text:#e7eef7; --accent:#4dd8a3; --danger:#ff5d6c; --line:#1e2a3a; --tab-active:#1e2a3a; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial; background:var(--bg); color:var(--text)}
+    .wrap{max-width:760px;margin:0 auto;padding:16px 14px 36px}
+    .header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+    h1{font-size:20px;margin:8px 0}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:12px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+    @media (min-width:520px){ .grid{grid-template-columns:repeat(3,1fr)} }
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+    input[type="number"], input[type="text"]{width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--line);background:#0f1520;color:var(--text);font-size:16px}
+    input::placeholder{color:#6b7c90}
+    .row{display:flex;align-items:center;gap:10px}
+    .btn{appearance:none;border:0;border-radius:12px;padding:11px 14px;font-weight:600;background:#1b2533;color:var(--text);cursor:pointer}
+    .btn:hover{filter:brightness(1.1)}
+    .btn-accent{background:var(--accent);color:#012916}
+    .btn-danger{background:var(--danger);color:#19030a}
+    .btn-short{background:var(--danger);color:#19030a}
+    .muted{color:var(--muted)}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#0b1320;border:1px solid var(--line);font-size:12px}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{padding:10px;border-bottom:1px dashed var(--line);text-align:right;font-variant-numeric:tabular-nums}
+    th:first-child, td:first-child{text-align:left}
+    tfoot td{border-top:1px solid var(--line);font-weight:700}
+    .right{float:right}
+    .note{font-size:12px;color:var(--muted)}
+    .ok{color:var(--accent)}
+    .bad{color:var(--danger)}
+    .sticky{position:sticky;bottom:0;backdrop-filter:blur(8px);background:linear-gradient(180deg, rgba(11,15,20,0), var(--bg));padding-top:12px;margin-top:8px}
+    .direction-long { color: var(--accent); }
+    .direction-short { color: var(--danger); }
+    
+    /* Tabs styling */
+    .tabs-container{position:relative;margin-bottom:12px}
+    .tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-ms-overflow-style:none}
+    .tabs::-webkit-scrollbar{display:none}
+    .tab{padding:8px 16px;border-radius:12px;background:var(--card);border:1px solid var(--line);cursor:pointer;white-space:nowrap;font-size:14px;flex-shrink:0}
+    .tab.active{background:var(--tab-active);border-color:var(--accent)}
+    .tab-add{padding:8px 12px;background:var(--accent);color:#012916;font-weight:bold;flex-shrink:0}
+    
+    /* Script name input */
+    .script-name-container{margin-bottom:12px}
+    .script-name-input{width:100%;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:#0f1520;color:var(--text);font-size:16px}
+    
+    /* Loading indicator */
+    .loading{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000}
+  </style>
+</head>
+<body>
+  <div id="loading" class="loading">Loading...</div>
+  
+  <div class="wrap" id="mainContent" style="display:none">
+    <div class="header">
+      <h1>📈 Pyramiding Risk Manager</h1>
+      <span class="pill">Mobile • Offline • PWA</span>
+    </div>
+
+    <div class="tabs-container">
+      <div class="tabs" id="tabsContainer"></div>
+    </div>
+
+    <div class="card">
+      <div class="script-name-container">
+        <input type="text" id="scriptName" class="script-name-input" placeholder="Enter script name (e.g., RELIANCE, INFY)" />
+      </div>
+      
+      <div class="row" style="justify-content: center; margin-bottom: 12px;">
+        <button id="tradeDirection" class="btn" style="width: 120px;">
+          Long ▲
+        </button>
+      </div>
+      <div class="grid">
+        <div>
+          <label>Currency Symbol</label>
+          <input id="currency" type="text" value="₹" maxlength="3" />
+        </div>
+        <div>
+          <label>Max Risk (absolute)</label>
+          <input id="risk" type="number" inputmode="decimal" value="1000" min="1" />
+        </div>
+        <div>
+          <label>Max Entries</label>
+          <input id="maxEntries" type="number" inputmode="numeric" value="10" min="1" max="20" />
+        </div>
+      </div>
+      <div class="grid" style="margin-top:10px">
+        <div>
+          <label>Current Price (optional)</label>
+          <input id="currentPrice" type="number" inputmode="decimal" placeholder="Live/Last price" />
+        </div>
+        <div class="row" style="align-items:flex-end;gap:8px;grid-column:span 2">
+          <button class="btn btn-accent" id="addEntry">+ Add Entry</button>
+          <button class="btn" id="addSample">Add Sample</button>
+          <button class="btn btn-danger right" id="reset">Reset</button>
+        </div>
+      </div>
+      <div class="note" style="margin-top:8px">
+        Enter quantity and price for each entry. Use decreasing quantities for better averaging (e.g., 200, 100, 100, 50, 50).
+      </div>
+    </div>
+
+    <div class="card" id="entriesCard">
+      <div id="entriesContainer"></div>
+    </div>
+
+    <div class="card" id="resultsCard">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <div class="muted">Running Summary</div>
+          <div id="summaryLine" style="font-weight:700;margin-top:6px"></div>
+        </div>
+        <div style="text-align:right">
+          <div class="muted">Combined Stoploss</div>
+          <div id="combinedSL" style="font-size:24px;font-weight:800"></div>
+        </div>
+      </div>
+
+      <table id="table">
+        <thead>
+          <tr>
+            <th>Entry</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Value</th>
+            <th>Cum Qty</th>
+            <th>Avg Cost</th>
+            <th>Stoploss</th>
+            <th>P&L @Now</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="8" id="foot"></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="sticky">
+        <div class="note">
+          Formula: SL<sub>i</sub> = AvgCost<sub>i</sub> <span id="directionSign">±</span> (MaxRisk / CumQty<sub>i</sub>). Never move SL against position.
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'pyramidingRiskManager';
+  const DEFAULT_STATE = {
+    entries: [],
+    isLong: true,
+    currency: '₹',
+    risk: 1000,
+    maxEntries: 10,
+    currentPrice: '',
+    scriptName: 'NIFTY'
+  };
+
+  const SAMPLE_ENTRIES = [
+    { quantity: 200, price: 100 },
+    { quantity: 100, price: 104 },
+    { quantity: 100, price: 108 },
+    { quantity: 50, price: 112 },
+    { quantity: 50, price: 116 }
+  ];
+
+  const els = {
+    currency: document.getElementById('currency'),
+    risk: document.getElementById('risk'),
+    maxEntries: document.getElementById('maxEntries'),
+    currentPrice: document.getElementById('currentPrice'),
+    scriptName: document.getElementById('scriptName'),
+    addEntry: document.getElementById('addEntry'),
+    addSample: document.getElementById('addSample'),
+    reset: document.getElementById('reset'),
+    tradeDirection: document.getElementById('tradeDirection'),
+    entriesContainer: document.getElementById('entriesContainer'),
+    tbody: document.getElementById('tbody'),
+    combinedSL: document.getElementById('combinedSL'),
+    summaryLine: document.getElementById('summaryLine'),
+    foot: document.getElementById('foot'),
+    tabsContainer: document.getElementById('tabsContainer'),
+    loading: document.getElementById('loading'),
+    mainContent: document.getElementById('mainContent')
+  };
+
+  let state = {...DEFAULT_STATE};
+  let tabs = {};
+  let currentTab = 'tab1';
+
+  // Safe localStorage functions with error handling
+  function safeSetItem(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+      return true;
+    } catch (e) {
+      console.error('localStorage set failed:', e);
+      return false;
+    }
+  }
+
+  function safeGetItem(key) {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : null;
+    } catch (e) {
+      console.error('localStorage get failed:', e);
+      return null;
+    }
+  }
+
+  // Initialize tabs with retry logic
+  function initTabs() {
+    let attempts = 0;
+    const maxAttempts = 3;
+    
+    function tryInit() {
+      const savedTabs = safeGetItem(STORAGE_KEY + '_tabs');
+      
+      if (savedTabs && Object.keys(savedTabs).length > 0) {
+        tabs = savedTabs;
+        renderTabs();
+        
+        // Try to restore last active tab, fallback to first tab
+        const lastActiveTab = safeGetItem(STORAGE_KEY + '_activeTab');
+        const firstTab = Object.keys(tabs)[0];
+        switchTab(lastActiveTab && tabs[lastActiveTab] ? lastActiveTab : firstTab);
+        
+        showContent();
+      } else if (attempts < maxAttempts) {
+        attempts++;
+        setTimeout(tryInit, 100 * attempts);
+      } else {
+        createDefaultTab();
+        showContent();
+      }
+    }
+    
+    tryInit();
+  }
+
+  function showContent() {
+    els.loading.style.display = 'none';
+    els.mainContent.style.display = 'block';
+  }
+
+  function createDefaultTab() {
+    tabs = {
+      tab1: {
+        ...DEFAULT_STATE,
+        scriptName: 'NIFTY'
+      }
+    };
+    safeSetItem(STORAGE_KEY + '_tabs', tabs);
+    safeSetItem(STORAGE_KEY + '_activeTab', 'tab1');
+    renderTabs();
+    switchTab('tab1');
+  }
+
+  function renderTabs() {
+    els.tabsContainer.innerHTML = '';
+    
+    Object.keys(tabs).forEach(tabId => {
+      const tab = document.createElement('div');
+      tab.className = `tab ${tabId === currentTab ? 'active' : ''}`;
+      tab.textContent = tabs[tabId].scriptName || `Tab ${tabId}`;
+      tab.setAttribute('data-tab', tabId);
+      tab.addEventListener('click', () => switchTab(tabId));
+      els.tabsContainer.appendChild(tab);
+    });
+    
+    const addBtn = document.createElement('div');
+    addBtn.className = 'tab tab-add';
+    addBtn.textContent = '+';
+    addBtn.addEventListener('click', addNewTab);
+    els.tabsContainer.appendChild(addBtn);
+  }
+
+  function addNewTab() {
+    const tabId = 'tab' + (Object.keys(tabs).length + 1);
+    tabs[tabId] = {...DEFAULT_STATE, scriptName: `SCRIPT ${Object.keys(tabs).length + 1}`};
+    saveTabs();
+    renderTabs();
+    switchTab(tabId);
+  }
+
+  function switchTab(tabId) {
+    if (!tabs[tabId]) {
+      // If tab doesn't exist, use first available tab
+      tabId = Object.keys(tabs)[0] || 'tab1';
+    }
+    
+    // Save current tab state
+    saveCurrentTabState();
+    
+    // Switch to new tab
+    currentTab = tabId;
+    state = {...tabs[tabId]};
+    
+    // Update UI
+    els.currency.value = state.currency || DEFAULT_STATE.currency;
+    els.risk.value = state.risk || DEFAULT_STATE.risk;
+    els.maxEntries.value = state.maxEntries || DEFAULT_STATE.maxEntries;
+    els.currentPrice.value = state.currentPrice || '';
+    els.scriptName.value = state.scriptName || DEFAULT_STATE.scriptName;
+    
+    // Rebuild entry inputs
+    els.entriesContainer.innerHTML = '';
+    (state.entries || []).forEach(entry => {
+      addEntryRow(entry.quantity, entry.price);
+    });
+    
+    updateDirectionButton();
+    compute();
+    renderTabs();
+    
+    // Save active tab
+    safeSetItem(STORAGE_KEY + '_activeTab', currentTab);
+  }
+
+  function saveCurrentTabState() {
+    if (!currentTab || !tabs[currentTab]) return;
+    
+    // Collect all entries from inputs
+    state.entries = [];
+    const entryRows = els.entriesContainer.querySelectorAll('.entry-row');
+    entryRows.forEach(row => {
+      const qtyInput = row.querySelector('.entry-qty');
+      const priceInput = row.querySelector('.entry-price');
+      state.entries.push({
+        quantity: qtyInput.value ? Number(qtyInput.value) : 0,
+        price: priceInput.value ? Number(priceInput.value) : 0
+      });
+    });
+    
+    state.currency = els.currency.value;
+    state.risk = Number(els.risk.value) || DEFAULT_STATE.risk;
+    state.maxEntries = Number(els.maxEntries.value) || DEFAULT_STATE.maxEntries;
+    state.currentPrice = els.currentPrice.value;
+    state.scriptName = els.scriptName.value;
+    
+    tabs[currentTab] = {...state};
+    saveTabs();
+  }
+
+  function saveTabs() {
+    safeSetItem(STORAGE_KEY + '_tabs', tabs);
+  }
+
+  function fmt(n){
+    if (isNaN(n) || !isFinite(n)) return '—';
+    return Number(n).toLocaleString(undefined,{maximumFractionDigits:0});
+  }
+
+  function fmtDecimal(n){
+    if (isNaN(n) || !isFinite(n)) return '—';
+    return Number(n).toLocaleString(undefined,{maximumFractionDigits:2});
+  }
+
+  function cur(n){
+    const c = els.currency.value || '₹';
+    if (isNaN(n) || !isFinite(n)) return '—';
+    return c + ' ' + Number(n).toLocaleString(undefined,{maximumFractionDigits:2});
+  }
+
+  function toggleTradeDirection() {
+    state.isLong = !state.isLong;
+    updateDirectionButton();
+    compute();
+    saveCurrentTabState();
+  }
+
+  function updateDirectionButton() {
+    els.tradeDirection.textContent = state.isLong ? 'Long ▲' : 'Short ▼';
+    els.tradeDirection.classList.toggle('btn-accent', state.isLong);
+    els.tradeDirection.classList.toggle('btn-short', !state.isLong);
+    document.getElementById('directionSign').textContent = state.isLong ? '−' : '+';
+  }
+
+  function addEntryRow(quantity = '', price = '') {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'entry-row grid-3';
+    wrapper.style.marginTop = '8px';
+
+    const label = document.createElement('div');
+    const entryIndex = els.entriesContainer.children.length + 1;
+    label.innerHTML = `<label>Entry #${entryIndex}</label>`;
+
+    const qtyInput = document.createElement('input');
+    qtyInput.type = 'number';
+    qtyInput.inputMode = 'numeric';
+    qtyInput.placeholder = 'Qty (e.g., 200)';
+    qtyInput.value = quantity;
+    qtyInput.className = 'entry-qty';
+    qtyInput.min = '1';
+    qtyInput.addEventListener('input', () => {
+      onChange();
+      saveCurrentTabState();
+    });
+
+    const priceInput = document.createElement('input');
+    priceInput.type = 'number';
+    priceInput.inputMode = 'decimal';
+    priceInput.placeholder = 'Price (e.g., 100.50)';
+    priceInput.value = price;
+    priceInput.className = 'entry-price';
+    priceInput.min = '0.01';
+    priceInput.step = '0.01';
+    priceInput.addEventListener('input', () => {
+      onChange();
+      saveCurrentTabState();
+    });
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'btn btn-danger';
+    removeBtn.textContent = 'Remove';
+    removeBtn.addEventListener('click', () => {
+      els.entriesContainer.removeChild(wrapper);
+      rebuildInputs();
+      compute();
+      saveCurrentTabState();
+    });
+
+    wrapper.appendChild(label);
+    wrapper.appendChild(qtyInput);
+    wrapper.appendChild(priceInput);
+    wrapper.appendChild(removeBtn);
+    els.entriesContainer.appendChild(wrapper);
+  }
+
+  function rebuildInputs() {
+    const entryRows = els.entriesContainer.querySelectorAll('.entry-row');
+    entryRows.forEach((row, index) => {
+      const label = row.querySelector('label');
+      if (label) label.textContent = `Entry #${index + 1}`;
+    });
+  }
+
+  function onChange() {
+    compute();
+  }
+
+  function compute() {
+    const risk = Math.max(0, Number(els.risk.value) || 0);
+    const cpx = els.currentPrice.value === '' ? NaN : Number(els.currentPrice.value);
+
+    // Collect all valid entries
+    const entries = [];
+    const entryRows = els.entriesContainer.querySelectorAll('.entry-row');
+    entryRows.forEach(row => {
+      const qtyInput = row.querySelector('.entry-qty');
+      const priceInput = row.querySelector('.entry-price');
+      const quantity = qtyInput.value ? Number(qtyInput.value) : NaN;
+      const price = priceInput.value ? Number(priceInput.value) : NaN;
+      
+      if (!isNaN(quantity) && !isNaN(price) && quantity > 0 && price > 0) {
+        entries.push({ quantity, price });
+      }
+    });
+
+    let rows = '';
+    let cumQty = 0;
+    let totalCost = 0;
+    let combinedSL = NaN;
+    let lastValidIdx = -1;
+
+    entries.forEach((entry, idx) => {
+      const { quantity, price } = entry;
+      cumQty += quantity;
+      totalCost += quantity * price;
+      const avgCost = totalCost / cumQty;
+      
+      // Calculate stoploss
+      const sl = state.isLong 
+        ? avgCost - (risk / cumQty)   // Long: SL below average
+        : avgCost + (risk / cumQty);  // Short: SL above average
+      
+      combinedSL = sl;
+      lastValidIdx = idx;
+
+      // Calculate P&L at current price
+      const pnlAtNow = isFinite(cpx) 
+        ? state.isLong 
+          ? (cpx - avgCost) * cumQty  // Long: profit if current > avg
+          : (avgCost - cpx) * cumQty  // Short: profit if current < avg
+        : NaN;
+
+      const slClass = state.isLong ? 'direction-long' : 'direction-short';
+      const entryValue = quantity * price;
+      
+      rows += `<tr>
+        <td>#${idx + 1}</td>
+        <td>${fmt(quantity)}</td>
+        <td>${cur(price)}</td>
+        <td>${cur(entryValue)}</td>
+        <td>${fmt(cumQty)}</td>
+        <td>${cur(avgCost)}</td>
+        <td class="${slClass}">${cur(sl)}</td>
+        <td>${isFinite(cpx) ? `<span class="${pnlAtNow >= 0 ? 'ok' : 'bad'}">${cur(pnlAtNow)}</span>` : '—'}</td>
+      </tr>`;
+    });
+
+    els.tbody.innerHTML = rows || `<tr><td colspan="8" class="muted" style="text-align:center;padding:16px">Add entries to see calculations…</td></tr>`;
+
+    if (lastValidIdx >= 0) {
+      const avgFinal = totalCost / cumQty;
+      const directionText = state.isLong ? 'long' : 'short';
+      const totalValue = totalCost;
+      
+      const txt = `${fmt(lastValidIdx + 1)} ${directionText} entries, ${fmt(cumQty)} shares, Avg ${cur(avgFinal)} • Total: ${cur(totalValue)} • Risk: ${cur(risk)}`;
+      els.summaryLine.textContent = txt;
+      
+      els.combinedSL.className = state.isLong ? 'direction-long' : 'direction-short';
+      els.combinedSL.textContent = cur(combinedSL);
+      
+      const directionAdvice = state.isLong
+        ? `Place one combined stoploss at <strong class="direction-long">${cur(combinedSL)}</strong> (below average).`
+        : `Place one combined stoploss at <strong class="direction-short">${cur(combinedSL)}</strong> (above average).`;
+      
+      els.foot.innerHTML = directionAdvice;
+    } else {
+      els.summaryLine.textContent = 'No positions yet';
+      els.combinedSL.textContent = '—';
+      els.foot.textContent = '';
+    }
+  }
+
+  // Event Listeners
+  els.addEntry.addEventListener('click', () => {
+    const maxEntries = Math.max(1, Math.min(20, Number(els.maxEntries.value) || 10));
+    if (state.entries && state.entries.length >= maxEntries) return alert('Reached Max Entries');
+    addEntryRow('', '');
+    compute();
+    saveCurrentTabState();
+  });
+
+  els.addSample.addEventListener('click', () => {
+    if (confirm('Replace current entries with sample decreasing pyramid?')) {
+      els.entriesContainer.innerHTML = '';
+      SAMPLE_ENTRIES.forEach(entry => {
+        addEntryRow(entry.quantity, entry.price);
+      });
+      compute();
+      saveCurrentTabState();
+    }
+  });
+
+  els.reset.addEventListener('click', () => {
+    if (confirm('Reset all entries and settings for this script?')) {
+      state.entries = [];
+      els.entriesContainer.innerHTML = '';
+      els.currentPrice.value = '';
+      compute();
+      saveCurrentTabState();
+    }
+  });
+
+  els.tradeDirection.addEventListener('click', toggleTradeDirection);
+
+  ['risk', 'currency', 'maxEntries', 'currentPrice', 'scriptName'].forEach(id => {
+    els[id].addEventListener('input', () => {
+      compute();
+      saveCurrentTabState();
+      if (id === 'scriptName') {
+        renderTabs();
+      }
+    });
+  });
+
+  // Initialize with error handling
+  setTimeout(() => {
+    try {
+      initTabs();
+    } catch (error) {
+      console.error('Initialization error:', error);
+      createDefaultTab();
+      showContent();
+    }
+  }, 100);
+})();
+
+// PWA Service Worker with GitHub Pages fix
+if ("serviceWorker" in navigator) {
+  window.addEventListener('load', () => {
+    // Fix for GitHub Pages subdirectory
+    if (window.location.pathname === '/' && !window.location.search.includes('pwa')) {
+      window.location.href = '/Pyramiding-Risk-Manager/';
+    } else {
+      navigator.serviceWorker.register('/Pyramiding-Risk-Manager/sw.js', {
+        scope: '/Pyramiding-Risk-Manager/'
+      })
+      .then(() => console.log("Service Worker registered"))
+      .catch(err => console.log("SW registration failed", err));
+    }
+  });
+}
+</script>
+</body>
+</html>

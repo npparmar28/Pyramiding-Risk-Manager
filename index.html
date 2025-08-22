@@ -67,6 +67,17 @@
     .modal-fade-in {
       animation: fadeIn 0.2s ease-out forwards;
     }
+    
+    /* Auto-save indicator */
+    .save-indicator {
+      transition: all 0.3s ease;
+    }
+    .save-indicator.saving {
+      opacity: 0.7;
+    }
+    .save-indicator.saved {
+      opacity: 1;
+    }
   </style>
 </head>
 <body class="bg-gray-900 text-gray-200 antialiased">
@@ -88,7 +99,10 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-blue-400"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
         Advanced Risk Manager
       </h1>
-      <span class="text-xs font-medium bg-gray-700 text-blue-300 px-2 py-1 rounded-full">PWA Ready</span>
+      <div class="flex items-center">
+        <span id="saveStatus" class="save-indicator text-xs font-medium bg-gray-700 text-green-400 px-2 py-1 rounded-full mr-2">Auto-save: ON</span>
+        <span class="text-xs font-medium bg-gray-700 text-blue-300 px-2 py-1 rounded-full">PWA Ready</span>
+      </div>
     </header>
 
     <!-- Tabs Section -->
@@ -284,6 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let tabs = {};
   let currentTabId = 'tab_1';
   let chartInstance = null;
+  let autoSaveTimeout = null;
 
   // --- ELEMENT CACHING ---
   const els = {
@@ -293,6 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Tabs
     tabsContainer: document.getElementById('tabsContainer'),
+    saveStatus: document.getElementById('saveStatus'),
 
     // Setup Card
     tradeDirection: document.getElementById('tradeDirection'),
@@ -358,6 +374,35 @@ document.addEventListener('DOMContentLoaded', () => {
       timeout = setTimeout(() => func.apply(this, args), delay);
     };
   };
+
+  // --- AUTO-SAVE FUNCTIONALITY ---
+  function triggerAutoSave() {
+    // Clear any existing timeout
+    if (autoSaveTimeout) {
+      clearTimeout(autoSaveTimeout);
+    }
+    
+    // Show saving status
+    els.saveStatus.textContent = 'Auto-save: Saving...';
+    els.saveStatus.classList.remove('saved');
+    els.saveStatus.classList.add('saving');
+    
+    // Set a new timeout to save after 1 second of inactivity
+    autoSaveTimeout = setTimeout(() => {
+      saveCurrentTabState();
+      
+      // Show saved status briefly
+      els.saveStatus.textContent = 'Auto-save: Saved';
+      els.saveStatus.classList.remove('saving');
+      els.saveStatus.classList.add('saved');
+      
+      // Revert to normal status after 2 seconds
+      setTimeout(() => {
+        els.saveStatus.textContent = 'Auto-save: ON';
+        els.saveStatus.classList.remove('saved');
+      }, 2000);
+    }, 1000);
+  }
 
   // --- MODAL LOGIC ---
   const Modal = {
@@ -446,6 +491,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.stoplossPrice = els.stoplossPrice.value;
     
     computeAndRender();
+    triggerAutoSave();
   }
   
   function distributeQuantities() {
@@ -477,6 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       renderEntries();
       computeAndRender();
+      triggerAutoSave();
   }
 
   // --- RENDERING ---
@@ -652,7 +699,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     renderGraph(finalAvg, combinedSL, cpx, validEntries);
-    saveCurrentTabState();
+    triggerAutoSave();
   }
   
   function renderGraph(avgPrice, stoplossPrice, currentPrice, entries) {
@@ -782,6 +829,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   valueEl.textContent = cur(entryValue);
               }
               computeAndRender();
+              triggerAutoSave();
           }
       }
   }
@@ -790,6 +838,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.isLong = !state.isLong;
     updateDirectionButton();
     calculatePositionSize(); // Re-validate and re-calculate
+    triggerAutoSave();
   }
   
   async function handleReset() {
@@ -804,6 +853,7 @@ document.addEventListener('DOMContentLoaded', () => {
           state.stoplossPrice = '';
           state.currentPrice = '';
           renderUI();
+          triggerAutoSave();
       }
   }
   
@@ -821,6 +871,7 @@ document.addEventListener('DOMContentLoaded', () => {
               });
               renderEntries();
               computeAndRender();
+              triggerAutoSave();
           }, 50);
       }, 50);
   }
@@ -869,7 +920,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function switchTab(tabId) {
     if (!tabs[tabId]) return;
-    saveCurrentTabState(); // Save state of the old tab
+    
+    // Save current state before switching
+    saveCurrentTabState();
+    
     currentTabId = tabId;
     state = { ...tabs[tabId] };
     safeSet(`${STORAGE_KEY_PREFIX}_activeTab`, currentTabId);
@@ -909,6 +963,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const lastActiveTabId = safeGet(`${STORAGE_KEY_PREFIX}_activeTab`);
     const firstTabId = Object.keys(tabs)[0];
     currentTabId = (lastActiveTabId && tabs[lastActiveTabId]) ? lastActiveTabId : firstTabId;
+    
+    // Load the current tab's state
+    if (tabs[currentTabId]) {
+      state = { ...tabs[currentTabId] };
+    } else {
+      // If the saved tab doesn't exist, create it
+      tabs[currentTabId] = { ...DEFAULT_STATE };
+      state = { ...DEFAULT_STATE };
+    }
 
     // Attach event listeners
     const debouncedCompute = debounce(computeAndRender, 250);
@@ -920,18 +983,26 @@ document.addEventListener('DOMContentLoaded', () => {
     els.addSample.addEventListener('click', handleAddSample);
     els.entriesContainer.addEventListener('input', handleEntryInputChange);
 
-    ['risk', 'currency', 'distRatios', 'currentPrice', 'scriptName'].forEach(id => {
-        els[id].addEventListener('input', debouncedCompute);
+    // Add auto-save to all input changes
+    ['risk', 'currency', 'distRatios', 'currentPrice', 'scriptName', 'entryPrice', 'stoplossPrice'].forEach(id => {
+        els[id].addEventListener('input', () => {
+            debouncedCompute();
+            triggerAutoSave();
+        });
     });
     
+    // Add specific handlers for entry/stoploss
     ['entryPrice', 'stoplossPrice'].forEach(id => {
         els[id].addEventListener('input', debouncedSizing);
     });
     
-    els.scriptName.addEventListener('change', renderTabs); // Update tab name when focus is lost
+    els.scriptName.addEventListener('change', () => {
+        renderTabs();
+        triggerAutoSave();
+    });
 
     // Initial render
-    switchTab(currentTabId);
+    renderUI();
 
     // Show the main content
     setTimeout(() => {
@@ -939,6 +1010,11 @@ document.addEventListener('DOMContentLoaded', () => {
         els.mainContent.style.opacity = '1';
         setTimeout(() => els.loading.style.display = 'none', 300);
     }, 200);
+    
+    // Save before page unload
+    window.addEventListener('beforeunload', () => {
+      saveCurrentTabState();
+    });
   }
 
   init();

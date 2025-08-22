@@ -63,10 +63,6 @@
     /* Loading indicator */
     .loading{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000}
     
-    /* Quantity input section */
-    .quantity-section{margin-bottom:12px;padding:10px;background:var(--card);border-radius:10px;border:1px solid var(--line)}
-    .quantity-input{font-size:16px;font-weight:600;text-align:center}
-    
     /* Entry cards */
     .entry-card{background:#0f1520;border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px}
     .entry-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
@@ -75,10 +71,12 @@
     .entry-value{font-size:11px}
     .entry-value strong{color:var(--text);font-weight:600}
     
-    /* Profit indicators */
-    .profit-badge{padding:2px 6px;border-radius:8px;font-size:10px;font-weight:600}
-    .profit-positive{background:var(--accent);color:#012916}
-    .profit-negative{background:var(--danger);color:#19030a}
+    /* Calculation section */
+    .calc-section{background:#0f1520;border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
+    .calc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .calc-label{font-size:12px;color:var(--muted)}
+    .calc-value{font-size:13px;font-weight:600}
+    .calc-result{background:var(--accent);color:#012916;padding:8px 12px;border-radius:8px;text-align:center;font-weight:700;margin-top:10px}
   </style>
 </head>
 <body>
@@ -112,20 +110,34 @@
         </div>
         <div>
           <label>Max Risk (₹)</label>
-          <input id="risk" type="number" inputmode="decimal" value="1000" min="1" />
+          <input id="risk" type="number" inputmode="decimal" value="1000" min="1" step="100" />
         </div>
         <div>
           <label>Current Price</label>
-          <input id="currentPrice" type="number" inputmode="decimal" placeholder="Live price" />
+          <input id="currentPrice" type="number" inputmode="decimal" placeholder="Live price" step="0.01" />
         </div>
       </div>
-      
-      <div class="quantity-section">
-        <label>Total Quantity to Distribute</label>
-        <input id="totalQuantity" type="number" inputmode="numeric" placeholder="Enter total shares" class="quantity-input" />
-        <div class="note" style="margin-top:6px">
-          Auto-distributed: 4X + 2X + 2X + 1X + 1X (10X total)
+
+      <div class="calc-section">
+        <div class="calc-row">
+          <span class="calc-label">Entry Price:</span>
+          <input type="number" id="entryPrice" placeholder="Entry price" step="0.01" 
+                 style="width:100px;padding:6px;border-radius:6px;border:1px solid var(--line);background:#0a101a;color:var(--text);text-align:center" />
         </div>
+        <div class="calc-row">
+          <span class="calc-label">Stoploss Price:</span>
+          <input type="number" id="stoplossPrice" placeholder="SL price" step="0.01"
+                 style="width:100px;padding:6px;border-radius:6px;border:1px solid var(--line);background:#0a101a;color:var(--text);text-align:center" />
+        </div>
+        <div class="calc-row">
+          <span class="calc-label">Risk per Share:</span>
+          <span class="calc-value" id="riskPerShare">—</span>
+        </div>
+        <div class="calc-row">
+          <span class="calc-label">Position Size:</span>
+          <span class="calc-value" id="positionSize">—</span>
+        </div>
+        <div class="calc-result" id="totalSharesResult">0 shares</div>
       </div>
 
       <div class="row" style="justify-content:space-between;gap:6px;margin-top:10px">
@@ -180,7 +192,7 @@
 
       <div class="sticky">
         <div class="note">
-          SL = Avg ± (Risk / Total Qty). P&L @Level shows cumulative profit at that entry price.
+          Position Size = Max Risk ÷ (Entry Price - Stoploss Price)
         </div>
       </div>
     </div>
@@ -196,7 +208,9 @@
     risk: 1000,
     currentPrice: '',
     scriptName: 'NIFTY',
-    totalQuantity: 0
+    entryPrice: 0,
+    stoplossPrice: 0,
+    totalShares: 0
   };
 
   const DISTRIBUTION_RATIOS = [4, 2, 2, 1, 1]; // 4X + 2X + 2X + 1X + 1X = 10X
@@ -207,7 +221,11 @@
     risk: document.getElementById('risk'),
     currentPrice: document.getElementById('currentPrice'),
     scriptName: document.getElementById('scriptName'),
-    totalQuantity: document.getElementById('totalQuantity'),
+    entryPrice: document.getElementById('entryPrice'),
+    stoplossPrice: document.getElementById('stoplossPrice'),
+    riskPerShare: document.getElementById('riskPerShare'),
+    positionSize: document.getElementById('positionSize'),
+    totalSharesResult: document.getElementById('totalSharesResult'),
     distributeBtn: document.getElementById('distributeBtn'),
     addSample: document.getElementById('addSample'),
     reset: document.getElementById('reset'),
@@ -245,6 +263,33 @@
       console.error('localStorage get failed:', e);
       return null;
     }
+  }
+
+  // Calculate position sizing
+  function calculatePositionSize() {
+    const entry = parseFloat(els.entryPrice.value) || 0;
+    const sl = parseFloat(els.stoplossPrice.value) || 0;
+    const risk = parseFloat(els.risk.value) || 0;
+    
+    if (entry > 0 && sl > 0 && risk > 0) {
+      const riskPerShare = Math.abs(entry - sl);
+      const positionSize = Math.floor(risk / riskPerShare);
+      
+      els.riskPerShare.textContent = cur(riskPerShare);
+      els.positionSize.textContent = fmt(positionSize) + ' shares';
+      els.totalSharesResult.textContent = fmt(positionSize) + ' shares';
+      
+      state.totalShares = positionSize;
+      state.entryPrice = entry;
+      state.stoplossPrice = sl;
+    } else {
+      els.riskPerShare.textContent = '—';
+      els.positionSize.textContent = '—';
+      els.totalSharesResult.textContent = '0 shares';
+      state.totalShares = 0;
+    }
+    
+    saveCurrentTabState();
   }
 
   // Initialize tabs
@@ -311,8 +356,10 @@
     els.risk.value = state.risk || 1000;
     els.currentPrice.value = state.currentPrice || '';
     els.scriptName.value = state.scriptName || 'NIFTY';
-    els.totalQuantity.value = state.totalQuantity || '';
+    els.entryPrice.value = state.entryPrice || '';
+    els.stoplossPrice.value = state.stoplossPrice || '';
     
+    calculatePositionSize();
     renderEntries();
     updateDirectionButton();
     compute();
@@ -327,7 +374,8 @@
     state.risk = Number(els.risk.value) || 1000;
     state.currentPrice = els.currentPrice.value;
     state.scriptName = els.scriptName.value;
-    state.totalQuantity = Number(els.totalQuantity.value) || 0;
+    state.entryPrice = parseFloat(els.entryPrice.value) || 0;
+    state.stoplossPrice = parseFloat(els.stoplossPrice.value) || 0;
     
     tabs[currentTab] = {...state};
     saveTabs();
@@ -338,13 +386,12 @@
   }
 
   function distributeQuantities() {
-    const totalQty = Number(els.totalQuantity.value);
-    if (!totalQty || totalQty <= 0) {
-      alert('Please enter a valid total quantity');
+    if (state.totalShares <= 0) {
+      alert('Please calculate position size first (enter Entry Price and Stoploss)');
       return;
     }
 
-    const unitSize = totalQty / TOTAL_RATIO;
+    const unitSize = state.totalShares / TOTAL_RATIO;
     state.entries = DISTRIBUTION_RATIOS.map(ratio => ({
       quantity: Math.round(ratio * unitSize),
       price: 0
@@ -517,35 +564,40 @@
   els.distributeBtn.addEventListener('click', distributeQuantities);
   
   els.addSample.addEventListener('click', () => {
-    els.totalQuantity.value = 500;
-    distributeQuantities();
-    // Set sample prices after a delay to ensure inputs are rendered
+    els.entryPrice.value = 100;
+    els.stoplossPrice.value = 95;
+    calculatePositionSize();
+    
     setTimeout(() => {
-      const samplePrices = [100, 104, 108, 112, 116];
-      samplePrices.forEach((price, index) => {
-        if (state.entries[index]) {
-          state.entries[index].price = price;
-          const input = document.querySelector(`.entry-price[data-index="${index}"]`);
-          if (input) input.value = price;
-          
-          // Update the value display
-          const entryValue = state.entries[index].quantity * price;
-          const valueElement = input.closest('.entry-card').querySelector('.entry-value strong');
-          if (valueElement) {
-            valueElement.textContent = cur(entryValue);
+      distributeQuantities();
+      setTimeout(() => {
+        const samplePrices = [100, 104, 108, 112, 116];
+        samplePrices.forEach((price, index) => {
+          if (state.entries[index]) {
+            state.entries[index].price = price;
+            const input = document.querySelector(`.entry-price[data-index="${index}"]`);
+            if (input) input.value = price;
+            
+            const entryValue = state.entries[index].quantity * price;
+            const valueElement = input.closest('.entry-card').querySelector('.entry-value strong');
+            if (valueElement) {
+              valueElement.textContent = cur(entryValue);
+            }
           }
-        }
-      });
-      compute();
-      saveCurrentTabState();
-    }, 200);
+        });
+        compute();
+        saveCurrentTabState();
+      }, 100);
+    }, 100);
   });
 
   els.reset.addEventListener('click', () => {
     if (confirm('Reset all data?')) {
       state.entries = [];
-      els.totalQuantity.value = '';
+      els.entryPrice.value = '';
+      els.stoplossPrice.value = '';
       els.currentPrice.value = '';
+      calculatePositionSize();
       renderEntries();
       compute();
       saveCurrentTabState();
@@ -554,7 +606,12 @@
 
   els.tradeDirection.addEventListener('click', toggleTradeDirection);
 
-  ['risk', 'currency', 'currentPrice', 'scriptName', 'totalQuantity'].forEach(id => {
+  // Add event listeners for position sizing calculation
+  ['risk', 'entryPrice', 'stoplossPrice'].forEach(id => {
+    els[id].addEventListener('input', calculatePositionSize);
+  });
+
+  ['currency', 'currentPrice', 'scriptName'].forEach(id => {
     els[id].addEventListener('input', () => {
       compute();
       saveCurrentTabState();

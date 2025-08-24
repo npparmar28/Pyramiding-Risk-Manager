@@ -1,0 +1,31 @@
+{
+  "name": "pyramiding-risk-manager",
+  "version": "1.0.0",
+  "main": "sw.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/npparmar28/Pyramiding-Risk-Manager.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/npparmar28/Pyramiding-Risk-Manager/issues"
+  },
+  "homepage": "https://github.com/npparmar28/Pyramiding-Risk-Manager#readme",
+  "description": "Android app wrapper for PWA",
+  "private": "true",
+  "type": "module",
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^7.4.3",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/core": "^7.4.3"
+  }
+}
